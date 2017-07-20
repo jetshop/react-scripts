@@ -176,11 +176,11 @@ module.exports = {
               presets: [require.resolve('babel-preset-react-app')],
               // @remove-on-eject-end
               plugins: [
-                ["styled-components", {
-                  // "ssr": true,
+                [require.resolve("babel-plugin-styled-components"), {
+                  "ssr": false,
                   "preprocess": true
                 }],
-                "polished"
+                require.resolve("babel-plugin-polished")
               ],
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/

@@ -161,11 +161,11 @@ module.exports = {
               presets: [require.resolve('babel-preset-react-app')],
               // @remove-on-eject-end
               plugins: [
-                ["styled-components", {
+                [require.resolve("babel-plugin-styled-components"), {
                   "ssr": true,
                   "preprocess": true
                 }],
-                "polished"
+                require.resolve("babel-plugin-polished")
               ],
               compact: true,
             },
