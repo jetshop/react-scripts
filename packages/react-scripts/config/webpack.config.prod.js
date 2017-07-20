@@ -160,6 +160,13 @@ module.exports = {
               babelrc: false,
               presets: [require.resolve('babel-preset-react-app')],
               // @remove-on-eject-end
+              plugins: [
+                ["styled-components", {
+                  "ssr": true,
+                  "preprocess": true
+                }],
+                "polished"
+              ],
               compact: true,
             },
           },
