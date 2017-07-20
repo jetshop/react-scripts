@@ -1,14 +1,15 @@
 {
-  "name": "react-scripts",
+  "private": false,
+  "name": "@jetshop/react-scripts",
   "version": "1.0.10",
   "description": "Configuration and scripts for Create React App.",
-  "repository": "facebookincubator/create-react-app",
+  "repository": "jetshop/react-scripts",
   "license": "BSD-3-Clause",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/facebookincubator/create-react-app/issues"
+    "url": "https://github.com/jetshop/react-scripts/issues"
   },
   "files": [
     "bin",
