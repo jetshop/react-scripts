@@ -15,6 +15,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+const ReplaceHtmlPlugin = require('./replace-html-plugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
@@ -176,11 +177,14 @@ module.exports = {
               presets: [require.resolve('babel-preset-react-app')],
               // @remove-on-eject-end
               plugins: [
-                [require.resolve("babel-plugin-styled-components"), {
-                  "ssr": false,
-                  "preprocess": true
-                }],
-                require.resolve("babel-plugin-polished")
+                [
+                  require.resolve('babel-plugin-styled-components'),
+                  {
+                    ssr: false,
+                    preprocess: true,
+                  },
+                ],
+                require.resolve('babel-plugin-polished'),
               ],
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -216,6 +220,13 @@ module.exports = {
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     // In development, this will be an empty string.
     new InterpolateHtmlPlugin(env.raw),
+    // Make sure we don't end up with slot tags ruining our markup
+    new ReplaceHtmlPlugin([
+      {
+        pattern: /<slot name="[a-zA-Z0-9]*" *\/>/g,
+        value: '',
+      },
+    ]),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,

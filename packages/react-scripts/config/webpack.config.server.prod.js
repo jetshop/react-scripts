@@ -158,11 +158,14 @@ module.exports = {
               presets: [require.resolve('babel-preset-react-app')],
               // @remove-on-eject-end
               plugins: [
-                [require.resolve("babel-plugin-styled-components"), {
-                  "ssr": true,
-                  "preprocess": true
-                }],
-                require.resolve("babel-plugin-polished")
+                [
+                  require.resolve('babel-plugin-styled-components'),
+                  {
+                    ssr: true,
+                    preprocess: true,
+                  },
+                ],
+                require.resolve('babel-plugin-polished'),
               ],
               compact: true,
             },
@@ -193,9 +196,11 @@ module.exports = {
     // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
     // It is absolutely essential that NODE_ENV was set to production here.
     // Otherwise React will be compiled in the very slow development mode.
-    new webpack.DefinePlugin(Object.assign(env.stringified, {
-      'process.env.BUILD_TARGET': JSON.stringify('server')
-    })),
+    new webpack.DefinePlugin(
+      Object.assign(env.stringified, {
+        'process.env.BUILD_TARGET': JSON.stringify('server'),
+      })
+    ),
     // Minify the code.
     new webpack.optimize.UglifyJsPlugin({
       compress: {

@@ -33,25 +33,26 @@ app.use(compression()); // gzip
 app.use(express.static(paths.appBuild + '/client')); // serve static files
 
 app.use((req, res) => {
-  renderOnServer(req.url).then(({ error, redirectLocation, html, css }) => {
+  renderOnServer(req.url).then(({ error, redirectLocation, inject }) => {
     if (error) {
       res.status(500).send(error.message);
     } else if (redirectLocation) {
       res.redirect(302, redirectLocation);
     } else {
-      res.status(200).send(template
-        .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
-        .replace('</head>', `${css}</head>`)
+      const html = Object.keys(inject).reduce(
+        (output, key) => output.replace(`<slot name="${key}"/>`, inject[key]),
+        template
       );
+      res.status(200).send(html);
     }
-  })
+  });
 });
 
-app.listen(PORT, (err) => {
+app.listen(PORT, err => {
   if (err) {
     console.error(err);
     process.exit(1);
   } else {
     console.log('Listening to port', PORT);
   }
-})
+});
