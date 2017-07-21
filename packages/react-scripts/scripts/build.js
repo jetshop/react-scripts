@@ -24,21 +24,17 @@ process.on('unhandledRejection', err => {
 // Ensure environment variables are read.
 require('../config/env');
 
-const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
-const config = require('../config/webpack.config.prod');
 const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
-const useYarn = fs.existsSync(paths.yarnLockFile);
 
 // These sizes are pretty large. We'll warn for bundles exceeding them.
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
@@ -49,17 +45,22 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
 
-// First, read the current file sizes in build directory.
-// This lets us display how much they changed later.
-measureFileSizesBeforeBuild(paths.appBuild)
-  .then(previousFileSizes => {
+function compile(target) {
+  const buildPath = `${paths.appBuild}/${target}`;
+
+  // First, read the current file sizes in build directory.
+  // This lets us display how much they changed later.
+  return measureFileSizesBeforeBuild(buildPath)
+    .then(previousFileSizes => {
     // Remove all content but keep the directory so that
     // if you're in it, you don't end up in Trash
-    fs.emptyDirSync(paths.appBuild);
+    fs.emptyDirSync(buildPath);
     // Merge with the public folder
-    copyPublicFolder();
+    if (target === 'client') {
+      copyPublicFolder();
+    }
     // Start the webpack build
-    return build(previousFileSizes);
+    return build(target, previousFileSizes);
   })
   .then(
     ({ stats, previousFileSizes, warnings }) => {
@@ -84,22 +85,9 @@ measureFileSizesBeforeBuild(paths.appBuild)
       printFileSizesAfterBuild(
         stats,
         previousFileSizes,
-        paths.appBuild,
+        buildPath,
         WARN_AFTER_BUNDLE_GZIP_SIZE,
         WARN_AFTER_CHUNK_GZIP_SIZE
-      );
-      console.log();
-
-      const appPackage = require(paths.appPackageJson);
-      const publicUrl = paths.publicUrl;
-      const publicPath = config.output.publicPath;
-      const buildFolder = path.relative(process.cwd(), paths.appBuild);
-      printHostingInstructions(
-        appPackage,
-        publicUrl,
-        publicPath,
-        buildFolder,
-        useYarn
       );
     },
     err => {
@@ -108,10 +96,13 @@ measureFileSizesBeforeBuild(paths.appBuild)
       process.exit(1);
     }
   );
+}
 
 // Create the production build and print the deployment instructions.
-function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
+function build(target, previousFileSizes) {
+  console.log(`Creating an optimized production build of ${target}...`);
+
+  const config = require(`../config/webpack.config.${target}.prod.js`);
 
   let compiler = webpack(config);
   return new Promise((resolve, reject) => {
@@ -147,8 +138,12 @@ function build(previousFileSizes) {
 }
 
 function copyPublicFolder() {
-  fs.copySync(paths.appPublic, paths.appBuild, {
+  fs.copySync(paths.appPublic, paths.appBuild + '/client', {
     dereference: true,
     filter: file => file !== paths.appHtml,
   });
 }
+
+compile('client')
+  .then(() => compile('server'))
+  .then(() => console.log('All done!'));
