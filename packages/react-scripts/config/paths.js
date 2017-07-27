@@ -19,7 +19,8 @@ const url = require('url');
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
-const resolveLibPaths = (...libs) => libs.map(lib => fs.realpathSync(resolveApp(`node_modules/@jetshop/${lib}`)))
+const resolveLibPaths = (...libs) =>
+  libs.map(lib => fs.realpathSync(resolveApp(`node_modules/@jetshop/${lib}`)));
 
 const envPublicUrl = process.env.PUBLIC_URL;
 
@@ -64,7 +65,7 @@ module.exports = {
   testsSetup: resolveApp('src/setupTests.js'),
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
-  servedPath: getServedPath(resolveApp('package.json')),
+  servedPath: getServedPath(resolveApp('package.json'))
 };
 
 // @remove-on-eject-begin
@@ -88,7 +89,7 @@ module.exports = {
   servedPath: getServedPath(resolveApp('package.json')),
   // These properties only exist before ejecting:
   ownPath: resolveOwn('.'),
-  ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
+  ownNodeModules: resolveOwn('node_modules') // This is empty on npm 3
 };
 
 const ownPackageJson = require('../package.json');
@@ -118,7 +119,7 @@ if (
     servedPath: getServedPath(resolveOwn('package.json')),
     // These properties only exist before ejecting:
     ownPath: resolveOwn('.'),
-    ownNodeModules: resolveOwn('node_modules'),
+    ownNodeModules: resolveOwn('node_modules')
   };
 }
 // @remove-on-eject-end

@@ -13,7 +13,7 @@ import load from 'absoluteLoad';
 
 export default class extends Component {
   static propTypes = {
-    onReady: PropTypes.func.isRequired,
+    onReady: PropTypes.func.isRequired
   };
 
   constructor(props) {

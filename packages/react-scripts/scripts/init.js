@@ -43,7 +43,7 @@ module.exports = function(
     build: 'react-scripts build',
     test: 'react-scripts test --env=jsdom',
     serve: 'react-scripts serve',
-    storybook: 'react-scripts storybook',
+    storybook: 'react-scripts storybook'
   };
 
   fs.writeFileSync(

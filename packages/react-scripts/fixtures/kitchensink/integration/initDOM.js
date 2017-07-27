@@ -66,14 +66,14 @@ export default feature =>
     const doc = jsdom.jsdom(markup, {
       features: {
         FetchExternalResources: ['script', 'css'],
-        ProcessExternalResources: ['script'],
+        ProcessExternalResources: ['script']
       },
       created: (_, win) =>
         win.addEventListener('ReactFeatureDidMount', () => resolve(doc), true),
       deferClose: true,
       resourceLoader,
       url: `${host}#${feature}`,
-      virtualConsole: jsdom.createVirtualConsole().sendTo(console),
+      virtualConsole: jsdom.createVirtualConsole().sendTo(console)
     });
 
     doc.close();

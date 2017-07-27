@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 
 class BuiltEmitter extends Component {
   static propTypes = {
-    feature: PropTypes.func.isRequired,
+    feature: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -34,7 +34,7 @@ class BuiltEmitter extends Component {
     return (
       <div>
         {createElement(feature, {
-          onReady: handleReady,
+          onReady: handleReady
         })}
       </div>
     );

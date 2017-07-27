@@ -33,14 +33,14 @@ choosePort(HOST, DEFAULT_PORT)
         '--port',
         port,
         '--host',
-        HOST,
+        HOST
       ].concat(args),
       {
         env: Object.assign({}, process.env, {
           STORYBOOK_APP_ROOT: appDirectory,
-          NODE_PATH: ownNodeModules,
+          NODE_PATH: ownNodeModules
         }),
-        stdio: 'inherit',
+        stdio: 'inherit'
       }
     );
     if (result.signal) {
