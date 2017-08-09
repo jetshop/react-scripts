@@ -20,6 +20,12 @@ const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const renderOnServer = require(paths.appBuild + '/server/server').default;
 
+const injectDataIntoSlots = (data, template) =>
+  Object.keys(data).reduce(
+    (output, key) => output.replace(`<slot name="${key}"/>`, data[key]),
+    template
+  );
+
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 if (!checkRequiredFiles([paths.appHtml, paths.appBuild])) {
@@ -34,17 +40,11 @@ app.use(express.static(paths.appBuild + '/client')); // serve static files
 
 app.use((req, res) => {
   renderOnServer(req.url)
-    .then(({ error, redirectLocation, inject }) => {
-      if (error) {
-        res.status(500).send(error.message);
-      } else if (redirectLocation) {
-        res.redirect(302, redirectLocation);
+    .then(data => {
+      if (data.ReactRouterDOM.url) {
+        res.redirect(301, data.ReactRouterDOM.url);
       } else {
-        const html = Object.keys(inject).reduce(
-          (output, key) => output.replace(`<slot name="${key}"/>`, inject[key]),
-          template
-        );
-        res.status(200).send(html);
+        res.status(200).send(injectDataIntoSlots(data, template));
       }
     })
     .catch(res.error);
