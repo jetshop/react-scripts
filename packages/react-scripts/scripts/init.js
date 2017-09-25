@@ -42,7 +42,8 @@ module.exports = function(
     start: 'react-scripts start',
     build: 'react-scripts build',
     test: 'react-scripts test --env=jsdom',
-    eject: 'react-scripts eject',
+    serve: 'react-scripts serve',
+    storybook: 'react-scripts storybook',
   };
 
   fs.writeFileSync(
