@@ -10,6 +10,7 @@
 // @remove-on-eject-end
 'use strict';
 
+const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -64,12 +65,12 @@ const babelLoaderOptions = {
       require.resolve('babel-plugin-styled-components'),
       {
         ssr: true,
-        preprocess: true
-      }
+        preprocess: true,
+      },
     ],
-    require.resolve('babel-plugin-polished')
+    require.resolve('babel-plugin-polished'),
   ],
-  compact: true
+  compact: true,
 };
 
 // This is the production configuration.
@@ -95,7 +96,9 @@ module.exports = {
     publicPath: publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
-      path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/')
+      path
+        .relative(paths.appSrc, info.absoluteResourcePath)
+        .replace(/\\/g, '/'),
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -125,7 +128,7 @@ module.exports = {
       // @remove-on-eject-end
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web'
+      'react-native': 'react-native-web',
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -133,8 +136,8 @@ module.exports = {
       // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
       // please link the files into your node_modules/ and let module-resolution kick in.
       // Make sure your source files are compiled, as they will not be processed in any way.
-      new ModuleScopePlugin(paths.appSrc)
-    ]
+      new ModuleScopePlugin(paths.appSrc),
+    ],
   },
   module: {
     strictExportPresence: true,
@@ -157,16 +160,16 @@ module.exports = {
               // TODO: consider separate config for production,
               // e.g. to enable no-console and no-debugger only in production.
               baseConfig: {
-                extends: [require.resolve('eslint-config-react-app')]
+                extends: [require.resolve('eslint-config-react-app')],
               },
               ignore: false,
-              useEslintrc: false
+              useEslintrc: false,
               // @remove-on-eject-end
             },
-            loader: require.resolve('eslint-loader')
-          }
+            loader: require.resolve('eslint-loader'),
+          },
         ],
-        include: paths.appSrc
+        include: paths.appSrc,
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -180,15 +183,15 @@ module.exports = {
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
-              name: 'static/media/[name].[hash:8].[ext]'
-            }
+              name: 'static/media/[name].[hash:8].[ext]',
+            },
           },
           // Process JS with Babel.
           {
             test: /\.(js|jsx)$/,
             include: [paths.appSrc, paths.libSrc],
             loader: require.resolve('babel-loader'),
-            options: babelLoaderOptions
+            options: babelLoaderOptions,
           },
           // Process TS with TypeScript and Babel
           {
@@ -197,10 +200,64 @@ module.exports = {
             use: [
               {
                 loader: require.resolve('babel-loader'),
-                options: babelLoaderOptions
+                options: babelLoaderOptions,
               },
-              { loader: require.resolve('ts-loader') }
-            ]
+              { loader: require.resolve('ts-loader') },
+            ],
+          },
+          // The notation here is somewhat confusing.
+          // "postcss" loader applies autoprefixer to our CSS.
+          // "css" loader resolves paths in CSS and adds assets as dependencies.
+          // "style" loader normally turns CSS into JS modules injecting <style>,
+          // but unlike in development configuration, we do something different.
+          // `ExtractTextPlugin` first applies the "postcss" and "css" loaders
+          // (second argument), then grabs the result CSS and puts it into a
+          // separate file in our build process. This way we actually ship
+          // a single CSS file in production instead of JS code injecting <style>
+          // tags. If you use code splitting, however, any async bundles will still
+          // use the "style" loader inside the async code so CSS from them won't be
+          // in the main CSS file.
+          {
+            test: /\.css$/,
+            loader: ExtractTextPlugin.extract(
+              Object.assign(
+                {
+                  fallback: require.resolve('style-loader'),
+                  use: [
+                    {
+                      loader: require.resolve('css-loader'),
+                      options: {
+                        importLoaders: 1,
+                        minimize: true,
+                        sourceMap: true,
+                      },
+                    },
+                    {
+                      loader: require.resolve('postcss-loader'),
+                      options: {
+                        // Necessary for external CSS imports to work
+                        // https://github.com/facebookincubator/create-react-app/issues/2677
+                        ident: 'postcss',
+                        plugins: () => [
+                          require('postcss-flexbugs-fixes'),
+                          autoprefixer({
+                            browsers: [
+                              '>1%',
+                              'last 4 versions',
+                              'Firefox ESR',
+                              'not ie < 9', // React doesn't support IE8 anyway
+                            ],
+                            flexbox: 'no-2009',
+                          }),
+                        ],
+                      },
+                    },
+                  ],
+                },
+                extractTextPluginOptions
+              )
+            ),
+            // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
           },
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.
@@ -214,14 +271,14 @@ module.exports = {
             // by webpacks internal loaders.
             exclude: [/\.js$/, /\.html$/, /\.json$/],
             options: {
-              name: 'static/media/[name].[hash:8].[ext]'
-            }
-          }
+              name: 'static/media/[name].[hash:8].[ext]',
+            },
+          },
           // ** STOP ** Are you adding a new loader?
           // Make sure to add the new loader(s) before the "file" loader.
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   plugins: [
     // Makes some environment variables available in index.html.
@@ -245,8 +302,8 @@ module.exports = {
         keepClosingSlash: true,
         minifyJS: true,
         minifyCSS: true,
-        minifyURLs: true
-      }
+        minifyURLs: true,
+      },
     }),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
@@ -254,7 +311,7 @@ module.exports = {
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(
       Object.assign(env.stringified, {
-        'process.env.BUILD_TARGET': JSON.stringify('client')
+        'process.env.BUILD_TARGET': JSON.stringify('client'),
       })
     ),
     // Minify the code.
@@ -265,25 +322,25 @@ module.exports = {
         // https://github.com/facebookincubator/create-react-app/issues/2376
         // Pending further investigation:
         // https://github.com/mishoo/UglifyJS2/issues/2011
-        comparisons: false
+        comparisons: false,
       },
       output: {
         comments: false,
         // Turned on because emoji and regex is not minified properly using default
         // https://github.com/facebookincubator/create-react-app/issues/2488
-        ascii_only: true
+        ascii_only: true,
       },
-      sourceMap: true
+      sourceMap: true,
     }),
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
-      filename: cssFilename
+      filename: cssFilename,
     }),
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without
     // having to parse `index.html`.
     new ManifestPlugin({
-      fileName: 'asset-manifest.json'
+      fileName: 'asset-manifest.json',
     }),
     // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
@@ -313,14 +370,14 @@ module.exports = {
       // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
       navigateFallbackWhitelist: [/^(?!\/__).*/],
       // Don't precache sourcemaps (they're large) and build asset manifest:
-      staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/]
+      staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/],
     }),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical
     // solution that requires the user to opt into importing specific locales.
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
@@ -328,6 +385,6 @@ module.exports = {
     dgram: 'empty',
     fs: 'empty',
     net: 'empty',
-    tls: 'empty'
-  }
+    tls: 'empty',
+  },
 };
