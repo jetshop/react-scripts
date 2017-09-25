@@ -32,6 +32,30 @@ const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
 
+const babelLoader = {
+  loader: require.resolve('babel-loader'),
+  options: {
+    // @remove-on-eject-begin
+    babelrc: false,
+    presets: [require.resolve('babel-preset-react-app')],
+    // @remove-on-eject-end
+    plugins: [
+      [
+        require.resolve('babel-plugin-styled-components'),
+        {
+          ssr: false,
+          preprocess: true,
+        },
+      ],
+      require.resolve('babel-plugin-polished'),
+    ],
+    // This is a feature of `babel-loader` for webpack (not Babel itself).
+    // It enables caching results in ./node_modules/.cache/babel-loader/
+    // directory for faster rebuilds.
+    cacheDirectory: true,
+  },
+};
+
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
@@ -96,7 +120,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.ts', '.tsx'],
     alias: {
       // @remove-on-eject-begin
       // Resolve Babel runtime relative to react-scripts.
@@ -170,27 +194,12 @@ module.exports = {
           {
             test: /\.(js|jsx)$/,
             include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-              // @remove-on-eject-begin
-              babelrc: false,
-              presets: [require.resolve('babel-preset-react-app')],
-              // @remove-on-eject-end
-              plugins: [
-                [
-                  require.resolve('babel-plugin-styled-components'),
-                  {
-                    ssr: false,
-                    preprocess: true,
-                  },
-                ],
-                require.resolve('babel-plugin-polished'),
-              ],
-              // This is a feature of `babel-loader` for webpack (not Babel itself).
-              // It enables caching results in ./node_modules/.cache/babel-loader/
-              // directory for faster rebuilds.
-              cacheDirectory: true,
-            },
+            use: [babelLoader],
+          },
+          {
+            test: /\.(ts|tsx)$/,
+            include: paths.appSrc,
+            use: [babelLoader, require.resolve('ts-loader')],
           },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.

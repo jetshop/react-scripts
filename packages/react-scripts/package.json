@@ -54,6 +54,8 @@
     "react-dev-utils": "^3.0.2",
     "react-error-overlay": "^1.0.9",
     "sw-precache-webpack-plugin": "0.11.3",
+    "ts-loader": "^2.3.2",
+    "typescript": "^2.4.2",
     "url-loader": "0.5.9",
     "webpack": "2.6.1",
     "webpack-dev-server": "2.5.1",
